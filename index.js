@@ -218,6 +218,16 @@ const nextButton = document.getElementById("next-btn");
 let currentQuestionIndex = 0;
 let score = 0;
 
+nextButton.addEventListener("click", () => {
+  currentQuestionIndex += 1;
+  nextButton.style.display = "none";
+  if (currentQuestionIndex == questions.length) {
+    showScore();
+  } else {
+    showQuestion();
+  }
+});
+
 function startQuiz() {
   currentQuestionIndex = 0;
   score = 0;
@@ -225,7 +235,32 @@ function startQuiz() {
   showQuestion();
 }
 
+function checkAnswer(button, buttonSet) {
+  if (button.dataset.correctValue == "true") {
+    score += 1;
+  } else {
+    button.classList.add("wrong");
+  }
+  [...buttonSet.children].forEach((button) => {
+    if (button.dataset.correctValue == "true") {
+      button.classList.add("right");
+    }
+  });
+  nextButton.style.display = "block";
+}
+
+function showScore() {
+  answerButtons.innerHTML = "";
+  questionElement.innerHTML =
+    "You ended up with a score of " +
+    score +
+    " out of " +
+    questions.length +
+    ". Thank you for playing!";
+}
+
 function showQuestion() {
+  answerButtons.innerHTML = "";
   let currentQuestion = questions[currentQuestionIndex];
   let questionExhibitNumber = currentQuestionIndex + 1;
   questionElement.innerHTML =
@@ -235,6 +270,12 @@ function showQuestion() {
     const button = document.createElement("button");
     button.innerHTML = answer.text;
     button.classList.add("btn");
+    button.dataset.correctValue = answer.correct;
+    button.addEventListener("click", () => {
+      checkAnswer(button, answerButtons);
+    });
     answerButtons.appendChild(button);
   });
 }
+
+startQuiz();
